@@ -66,34 +66,62 @@ namespace ArrayTest
         {
             var img1 = (byte[])new ImageConverter().ConvertTo(Image.FromFile(@"C: \Users\David\Desktop\TestAlea\img1.png"), typeof(byte[]));
             var img2 = (byte[])new ImageConverter().ConvertTo(Image.FromFile(@"C: \Users\David\Desktop\TestAlea\img2.png"), typeof(byte[]));
-            var sim = similarity(img1, img2);
+            Single sim = similarity(img1, img2);
+            Console.WriteLine(sim);
         }
 
-        private object similarity(byte[] img1, byte[] img2)
+        private Single similarity(byte[] img1, byte[] img2)
         {
             return 100 * Distance(img1, img2);
         }
 
-        private int Distance(byte[] img1, byte[] img2)
+        private Single Distance(byte[] img1, byte[] img2)
         {
-            Single finalDistance = 0;
-            int macroBlockSize = 32;
-            byte[,] subFirst;
-            byte[,] subSecond;
-            for (int y = 0; (y <= (CompareImageWidth - 1)); y = (y + macroBlockSize))
+            try
             {
+                Single finalDistance = 0;
+                int macroBlockSize = 32;
+                byte[,] subFirst;
+                byte[,] subSecond;
 
-                for (int x = 0; (x <= (CompareImageHeight - 1)); x = (x + macroBlockSize))
+                for (int y = 0; (y <= (CompareImageWidth - 1)); y = (y + macroBlockSize))
                 {
-                    // iterate vertically over all macroblocks
-                    byte[] macroblock1 = ConstructMacroblockAt(x, y, macroBlockSize, img1);
-                    byte[] macroblock2 = ConstructMacroblockAt(x, y, macroBlockSize, img2);
-                    finalDistance = (finalDistance + _ssim.Distance(macroblock1, macroblock2));
+                    for (int x = 0; (x <= (CompareImageHeight - 1)); x = (x + macroBlockSize))
+                    {
+                        // iterate vertically over all macroblocks
+                        byte[] macroblock1 = ConstructMacroblockAt(x, y, macroBlockSize, img1);
+                        byte[] macroblock2 = ConstructMacroblockAt(x, y, macroBlockSize, img2);
+                        finalDistance += _ssim.Distance(macroblock1, macroblock2);
+                    }
                 }
 
-            }
+                //for (int x = 0; x < CompareImageWidth - 1; x++)
+                //{
+                //    for (int y = 0; y < CompareImageHeight - 1; y++)
+                //    {
+                //        byte[] macroblock1 = ConstructMacroblockAt(x, y, macroBlockSize, img1);
+                //        byte[] macroblock2 = ConstructMacroblockAt(x, y, macroBlockSize, img2);
+                //        finalDistance = (finalDistance + _ssim.Distance(macroblock1, macroblock2));
+                //    }
+                //}
 
-            return Convert.ToInt32(finalDistance) / ((CompareImageWidth / macroBlockSize) * (CompareImageHeight / macroBlockSize));
+                //For y As Integer = 0 To CompareImageWidth -1 Step macroBlockSize 'iterate horizontally over all macroblocks
+                //For x As Integer = 0 To CompareImageHeight -1 Step macroBlockSize 'iterate vertically over all macroblocks
+                //    Dim macroblock1() As Byte = ConstructMacroblockAt(x, y, macroBlockSize, first)
+                //    Dim macroblock2() As Byte = ConstructMacroblockAt(x, y, macroBlockSize, second)
+                //    finalDistance += _ssim.Distance(macroblock1, macroblock2)
+                //Next x
+
+
+                //Next y
+
+                return Convert.ToSingle(finalDistance) / ((CompareImageWidth / macroBlockSize) * (CompareImageHeight / macroBlockSize));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return 0;
+            }
         }
 
         public byte[] ConstructMacroblockAt(int x, int y, int macrosize, byte[] source)
