@@ -64,8 +64,8 @@ namespace ArrayTest
 
         private void button2_Click(object sender, EventArgs e)
         {
-            var img1 = (byte[])new ImageConverter().ConvertTo(Image.FromFile(@"C: \Users\David\Desktop\TestAlea\img1.png"), typeof(byte[]));
-            var img2 = (byte[])new ImageConverter().ConvertTo(Image.FromFile(@"C: \Users\David\Desktop\TestAlea\img2.png"), typeof(byte[]));
+            var img1 = (byte[])new ImageConverter().ConvertTo(Image.FromFile(@"C:\Users\Dasumi\Source\Repos\arrTest\ArrayTest\bin\Debug\testImage\img1.jpg"), typeof(byte[]));
+            var img2 = (byte[])new ImageConverter().ConvertTo(Image.FromFile(@"C:\Users\Dasumi\Source\Repos\arrTest\ArrayTest\bin\Debug\testImage\img2.jpg"), typeof(byte[]));
             Single sim = similarity(img1, img2);
             Console.WriteLine(sim);
         }
@@ -88,32 +88,12 @@ namespace ArrayTest
                 {
                     for (int x = 0; (x <= (CompareImageHeight - 1)); x = (x + macroBlockSize))
                     {
-                        // iterate vertically over all macroblocks
                         byte[] macroblock1 = ConstructMacroblockAt(x, y, macroBlockSize, img1);
                         byte[] macroblock2 = ConstructMacroblockAt(x, y, macroBlockSize, img2);
+
                         finalDistance += _ssim.Distance(macroblock1, macroblock2);
                     }
                 }
-
-                //for (int x = 0; x < CompareImageWidth - 1; x++)
-                //{
-                //    for (int y = 0; y < CompareImageHeight - 1; y++)
-                //    {
-                //        byte[] macroblock1 = ConstructMacroblockAt(x, y, macroBlockSize, img1);
-                //        byte[] macroblock2 = ConstructMacroblockAt(x, y, macroBlockSize, img2);
-                //        finalDistance = (finalDistance + _ssim.Distance(macroblock1, macroblock2));
-                //    }
-                //}
-
-                //For y As Integer = 0 To CompareImageWidth -1 Step macroBlockSize 'iterate horizontally over all macroblocks
-                //For x As Integer = 0 To CompareImageHeight -1 Step macroBlockSize 'iterate vertically over all macroblocks
-                //    Dim macroblock1() As Byte = ConstructMacroblockAt(x, y, macroBlockSize, first)
-                //    Dim macroblock2() As Byte = ConstructMacroblockAt(x, y, macroBlockSize, second)
-                //    finalDistance += _ssim.Distance(macroblock1, macroblock2)
-                //Next x
-
-
-                //Next y
 
                 return Convert.ToSingle(finalDistance) / ((CompareImageWidth / macroBlockSize) * (CompareImageHeight / macroBlockSize));
             }
@@ -130,12 +110,15 @@ namespace ArrayTest
             int retPos = 0;
             //  our position in the return array
             int sourcePos = (x + (y * CompareImageWidth));
+
             Parallel.For(0, macrosize - 1, i =>
             {
                 Array.Copy(source, sourcePos, ret, retPos, macrosize);
                 retPos += macrosize;
                 sourcePos += CompareImageWidth;
             });
+
+            //start gpu conversion
 
             return ret;
         }
