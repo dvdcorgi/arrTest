@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Alea;
+using Alea.Parallel;
+using NUnit.Framework;
 
 namespace ArrayTest
 {
@@ -22,6 +22,16 @@ namespace ArrayTest
 
         private void button1_Click(object sender, EventArgs e)
         {
+            var arg1 = Enumerable.Range(0, 5).ToArray();
+            var arg2 = Enumerable.Range(0, 5).ToArray();
+            var result = new int[5];
+
+            Gpu.Default.For(0, result.Length, i => result[i] = arg1[i] + arg2[i]);
+
+            var expected = arg1.Zip(arg2, (x, y) => x + y);
+
+            Assert.That(result, Is.EqualTo(expected));
+
             testFunc(5);
         }
 
@@ -106,21 +116,43 @@ namespace ArrayTest
 
         public byte[] ConstructMacroblockAt(int x, int y, int macrosize, byte[] source)
         {
-            byte[] ret = new byte[(int)macrosize * macrosize - 1];
-            int retPos = 0;
-            //  our position in the return array
-            int sourcePos = (x + (y * CompareImageWidth));
-
-            Parallel.For(0, macrosize - 1, i =>
+            try
             {
-                Array.Copy(source, sourcePos, ret, retPos, macrosize);
-                retPos += macrosize;
-                sourcePos += CompareImageWidth;
-            });
+                byte[] ret = new byte[(int)macrosize * macrosize - 1];
+                int retPos = 0;
+                //  our position in the return array
+                int sourcePos = (x + (y * CompareImageWidth));
 
-            //start gpu conversion
+                Parallel.For(0, macrosize - 1, i =>
+                {
+                    Array.Copy(source, sourcePos, ret, retPos, macrosize);
+                    retPos += macrosize;
+                    sourcePos += CompareImageWidth;
+                });
 
-            return ret;
+                //start gpu conversion
+
+                var gpu = Gpu.Default;
+                Console.WriteLine(gpu);
+
+                //gpu.For(0, macrosize - 1, i =>
+                //{
+                //    Array.Copy(source, sourcePos, ret, retPos, macrosize);
+                //    retPos += macrosize;
+                //    sourcePos += CompareImageWidth;
+                //});
+
+                var expected = ret;
+
+                Assert.That(ret, Is.EqualTo(expected));
+
+                return ret;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("ConstructMacroblockAt Error: " + ex.Message);
+                return null;
+            }
         }
     }
 }
