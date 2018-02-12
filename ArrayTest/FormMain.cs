@@ -10,17 +10,17 @@ using NUnit.Framework;
 
 namespace ArrayTest
 {
-    public partial class Form1 : Form
+    public partial class FormMain : Form
     {
         private int CompareImageWidth = 32;
         private int CompareImageHeight = 32;
 
-        public Form1()
+        public FormMain()
         {
             InitializeComponent();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void Button1_Click(object sender, EventArgs e)
         {
             var arg1 = Enumerable.Range(0, 5).ToArray();
             var arg2 = Enumerable.Range(0, 5).ToArray();
@@ -32,10 +32,10 @@ namespace ArrayTest
 
             Assert.That(result, Is.EqualTo(expected));
 
-            testFunc(5);
+            TestFunc(5);
         }
 
-        private static void testFunc(int myCount)
+        private static void TestFunc(int myCount)
         {
             try
             {
@@ -72,15 +72,15 @@ namespace ArrayTest
 
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void Button2_Click(object sender, EventArgs e)
         {
             var img1 = (byte[])new ImageConverter().ConvertTo(Image.FromFile(@"C:\Users\Dasumi\Source\Repos\arrTest\ArrayTest\bin\Debug\testImage\img1.jpg"), typeof(byte[]));
             var img2 = (byte[])new ImageConverter().ConvertTo(Image.FromFile(@"C:\Users\Dasumi\Source\Repos\arrTest\ArrayTest\bin\Debug\testImage\img2.jpg"), typeof(byte[]));
-            Single sim = similarity(img1, img2);
+            Single sim = Similarity(img1, img2);
             Console.WriteLine(sim);
         }
 
-        private Single similarity(byte[] img1, byte[] img2)
+        private Single Similarity(byte[] img1, byte[] img2)
         {
             return 100 * Distance(img1, img2);
         }
